@@ -6,9 +6,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,10 +26,19 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnSwitch, btnMode, btnMood;
+    Button btnSwitch, btnMode, btnMood, button;
     int light=0;
     Boolean auto=false;
+    void cb(int r, int g, int b)
+    {
+        View rootView = findViewById(android.R.id.background);
+        rootView.setBackgroundColor(Color.rgb(r, g, b));
+    }
+    void maketoast(String msg)
+    {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
+    }
     void update()
     {
         Calendar calendar = Calendar.getInstance();
@@ -73,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
                 if (auto) {
 
                     update();
-                    handler.postDelayed(this, 60000); // Run this task every 1 minute
+                    System.out.println("da");
+                    handler.postDelayed(this, 60); // Run this task every 1 minute
                 }
             }
         };
@@ -91,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "Notificare");
         builder.setContentTitle("Good night");
         builder.setContentText("Good Night, the light has turned off automatically.");
@@ -100,24 +113,23 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         managerCompat.notify(1, builder.build());
-        this.btnSwitch = findViewById(R. id.btnSwitch);
+        this.btnSwitch = (Button) findViewById(R. id.btnSwitch);
 
         btnSwitch. setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceType")
             public void onClick(View v) {
-                System.out.println("tsts");
                 if(light==1)
-                {   View rootView = findViewById(android.R.id.content);
-                    rootView.setBackgroundColor(Color.rgb(180, 180, 180));;
+                {   cb(255, 255, 255);
                     light=0;
-                    System.out.println("tst");}
+                    maketoast("da");
+                    }
                 else
-                {   View rootView = findViewById(android.R.id.content);
+                {   View rootView = findViewById(android.R.id.background);
                     rootView.setBackgroundColor(Color.rgb(255, 255, 0));
                     light=1;}
             }
         });
-        this.btnMode = findViewById(R.id.btnMode);
+        btnMode = findViewById(R.id.btnMode);
         btnMode. setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceType")
             public void onClick(View v) {
@@ -133,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        this.btnMood = findViewById(R.id.btnMood);
+        btnMood = findViewById(R.id.btnMood);
         btnMode.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceType")
             public void onClick(View v) {
