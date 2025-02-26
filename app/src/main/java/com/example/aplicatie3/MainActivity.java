@@ -1,37 +1,31 @@
 package com.example.aplicatie3;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.io.Console;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnSwitch, btnMode, btnMood, button;
+    private LinearLayout background;
+    Button btnSwitch, btnMode, btnMood;
     int light=0;
     Boolean auto=false;
     void cb(int r, int g, int b)
     {
-        View rootView = findViewById(android.R.id.background);
+        View rootView = findViewById(R.id.Background);
         rootView.setBackgroundColor(Color.rgb(r, g, b));
     }
     void maketoast(String msg)
@@ -43,36 +37,14 @@ public class MainActivity extends AppCompatActivity {
     {
         Calendar calendar = Calendar.getInstance();
         int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-
         if (currentHour >= 7 && currentHour < 18) {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "Notificare");
-            builder.setContentTitle("Morning");
-            builder.setContentText("Good Morning, do you need more light?");
-            builder.setAutoCancel(true);
-            NotificationManagerCompat managerCompat = NotificationManagerCompat.from(MainActivity.this);
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            managerCompat.notify(1, builder.build());
-            View rootView = findViewById(android.R.id.content);
-            rootView.setBackgroundColor(Color.WHITE);
-            findViewById(android.R.id.content).setBackgroundColor(getResources().getColor(android.R.color.white));
+            maketoast("Good Morning, do you need more light?");
+            cb(255, 255, 255);
         } else if (currentHour >= 18 && currentHour < 22) {
-            View rootView = findViewById(android.R.id.content);
-            rootView.setBackgroundColor(Color.rgb(255, 255, 0));
-            findViewById(android.R.id.content).setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+            cb(255, 255, 0);
         } else {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "Notificare");
-            builder.setContentTitle("Good night");
-            builder.setContentText("Good Night, the light has turned off automatically.");
-            builder.setAutoCancel(true);
-            NotificationManagerCompat managerCompat = NotificationManagerCompat.from(MainActivity.this);
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            managerCompat.notify(1, builder.build());
-            View rootView = findViewById(android.R.id.content);
-            rootView.setBackgroundColor(Color.BLACK);
+            maketoast("Good Night, the light has turned off automatically.");
+            cb(0, 0, 0);
         }
     }
     void eventcheck()
@@ -84,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
                 if (auto) {
 
                     update();
-                    System.out.println("da");
                     handler.postDelayed(this, 60); // Run this task every 1 minute
                 }
             }
@@ -98,40 +69,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.Background), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "Notificare");
-        builder.setContentTitle("Good night");
-        builder.setContentText("Good Night, the light has turned off automatically.");
-        builder.setAutoCancel(true);
-        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(MainActivity.this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        managerCompat.notify(1, builder.build());
         this.btnSwitch = (Button) findViewById(R. id.btnSwitch);
 
         btnSwitch. setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("ResourceType")
+            @Override
             public void onClick(View v) {
                 if(light==1)
-                {   cb(255, 255, 255);
-                    light=0;
-                    maketoast("da");
+                {   light=0;
+                    cb(155, 155, 155);
                     }
                 else
-                {   View rootView = findViewById(android.R.id.background);
-                    rootView.setBackgroundColor(Color.rgb(255, 255, 0));
-                    light=1;}
+                {   light=1;
+
+
+                    cb(255, 255, 0);
+                }
             }
         });
         btnMode = findViewById(R.id.btnMode);
         btnMode. setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("ResourceType")
+            @Override
             public void onClick(View v) {
                 if(auto)
                 {
@@ -146,31 +108,28 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnMood = findViewById(R.id.btnMood);
-        btnMode.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("ResourceType")
+        btnMood.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
+                maketoast(Integer.toString(light));
                 if(light==2)
                 {
-                    View rootView = findViewById(android.R.id.content);
-                    rootView.setBackgroundColor(Color.rgb(255, 255, 255));
+                    cb(255, 255, 255);
                     light=3;
                 }
                 else if(light==3)
                 {
-                    View rootView = findViewById(android.R.id.content);
-                    rootView.setBackgroundColor(Color.rgb(0, 0, 255));
+                   cb(255, 0, 0);
                     light=4;
                 }
-                if(light==5)
+                else if(light==4)
                 {
-                    View rootView = findViewById(android.R.id.content);
-                    rootView.setBackgroundColor(Color.rgb(255, 0, 0));
+                    cb(0, 255, 0);
                     light=1;
                 }
                 else
                 {
-                    View rootView = findViewById(android.R.id.content);
-                    rootView.setBackgroundColor(Color.rgb(0, 255, 0));
+                    cb(0, 0, 255);
                     light=2;
                 }
             }
