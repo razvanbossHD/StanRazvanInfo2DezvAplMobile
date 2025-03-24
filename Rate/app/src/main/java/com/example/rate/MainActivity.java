@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import Classes.Connection;
+import Classes.Files;
 
 public class MainActivity extends AppCompatActivity {
     Button btnEnter;
@@ -64,14 +65,14 @@ public class MainActivity extends AppCompatActivity {
                 if(stcCookies.isChecked()){
                     if(!stcLogin.isChecked()){ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-                        Future<?> future = executorService.submit(new Connection("login " + txtUsername.getText().toString() + " " + txtEmail.getText().toString() + " " + txtPassword.getText().toString()));
 
-                        try {
+                        try {Future<?> future = executorService.submit(new Connection("login " + txtUsername.getText().toString() + " " + txtEmail.getText().toString() + " " + txtPassword.getText().toString(), getFilesDir()));
+                            String key=Files.getKey(getFilesDir());
                             future.get();
                             runOnUiThread(() -> {
-
-                                Intent intent = new Intent(MainActivity.this, Find.class);
-                                startActivity(intent);
+                                if(key!=null){
+                                    Intent intent = new Intent(MainActivity.this, Find.class);
+                                    startActivity(intent);}
                             });
 
                         } catch (Exception e) {
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     {
 
                         ExecutorService executorService = Executors.newSingleThreadExecutor();
-                        executorService.execute(new Connection("register "+txtUsername.getText()+" "+txtEmail.getText()+" "+txtPassword.getText()));
+                        executorService.execute(new Connection("register "+txtUsername.getText()+" "+txtEmail.getText()+" "+txtPassword.getText(), getFilesDir()));
                     }
                 }
 

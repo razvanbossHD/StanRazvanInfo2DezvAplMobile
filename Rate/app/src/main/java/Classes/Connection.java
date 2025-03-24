@@ -1,6 +1,7 @@
 package Classes;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -11,6 +12,7 @@ public class Connection implements Runnable {
     private static final String SERVER_IP = "10.0.2.2";
     private static final int SERVER_PORT = 65432;
     private String command="";
+    File dir;
     @Override
     public void run() {
         String response = "";
@@ -22,7 +24,7 @@ public class Connection implements Runnable {
             outputStream.flush();
 
             BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            System.out.println(inputStream.readLine());
+            Files.setKey( dir,inputStream.readLine());
 
             socket.close();
         } catch (UnknownHostException e) {
@@ -33,9 +35,11 @@ public class Connection implements Runnable {
             response = "IOException occurred.";
         }
     }
-    public Connection(String command)
+
+    public Connection(String command, File dir)
     {
         this.command=command;
+        this.dir=dir;
     }
 
 }
