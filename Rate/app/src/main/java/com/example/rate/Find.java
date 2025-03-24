@@ -11,7 +11,43 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Find extends AppCompatActivity {
+    private static final String SERVER_IP = "10.0.2.2";  // Your Python server IP
+    private static final int SERVER_PORT = 65432;        // Your Python server port
+
+    private class ConnectTask implements Runnable {
+
+        @Override
+        public void run() {
+            String response = "";
+            try {
+                // Create a socket to connect to the server
+                Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+
+                // Send a message to the server
+                OutputStream outputStream = socket.getOutputStream();
+                outputStream.write("Hello from Android client!".getBytes());
+                outputStream.flush();
+
+                // Receive the response from the server
+                BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                System.out.println(inputStream.readLine());  // Read the server's response
+
+                socket.close();  // Close the socket
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                response = "Unknown host exception.";
+            } catch (IOException e) {
+                e.printStackTrace();
+                response = "IOException occurred.";
+            }
+        }
+    }
 
     void newButton()
     {
@@ -19,7 +55,7 @@ public class Find extends AppCompatActivity {
         Button button = new Button(this);
         button.setText("adsx");
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,  // Width
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 500
         );
         button.setLayoutParams(layoutParams);
@@ -42,6 +78,8 @@ public class Find extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new ConnectTask());
         newButton();
         newButton();
         newButton();
