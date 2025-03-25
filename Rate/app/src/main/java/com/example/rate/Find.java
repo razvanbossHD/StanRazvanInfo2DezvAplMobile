@@ -1,5 +1,6 @@
 package com.example.rate;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,16 +16,21 @@ import java.io.*;
 import java.net.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import Classes.Connection;
+import Classes.Files;
+import Classes.Game;
 
 public class Find extends AppCompatActivity {
 
 
-    void newButton()
+    void newButton( String Name, int ID)
     {
+
         LinearLayout linearLayout = findViewById(R.id.scrLayout);
         Button button = new Button(this);
-        button.setText("adsx");
+        button.setText(Name);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 500
@@ -36,6 +42,9 @@ public class Find extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(Find.this, GamePage.class);
+                intent.putExtra("ID", ID);
+                startActivity(intent);
             }
         });
     }
@@ -49,11 +58,26 @@ public class Find extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        newButton();
-        newButton();
-        newButton();
-        newButton();
-        newButton();
-        newButton();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+
+        try {
+            Future<?> future = executorService.submit(new Connection("getgames ", getFilesDir()));
+
+            future.get();
+            runOnUiThread(() -> {
+                String[] games= Files.getKey(getFilesDir()).split(" ");
+                for(int i=0;2*i+1<games.length&&games[i]!=null;++i){
+                    System.out.println(games[2*i+1]+"  adsa");
+                    newButton(games[2*i], Integer.parseInt(games[2*i+1]) );
+                }
+
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            executorService.shutdown();
+        }
     }
 }

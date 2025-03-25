@@ -22,9 +22,10 @@ public class Connection implements Runnable {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(command.getBytes());
             outputStream.flush();
-
             BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            Files.setKey( dir,inputStream.readLine());
+            String a;
+            Files.setKey( dir,a=inputStream.readLine());
+
 
             socket.close();
         } catch (UnknownHostException e) {

@@ -62,15 +62,14 @@ public class MainActivity extends AppCompatActivity {
         btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(stcCookies.isChecked()){
-                    if(!stcLogin.isChecked()){ExecutorService executorService = Executors.newSingleThreadExecutor();
+                if(!stcLogin.isChecked()){ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
                         try {Future<?> future = executorService.submit(new Connection("login " + txtUsername.getText().toString() + " " + txtEmail.getText().toString() + " " + txtPassword.getText().toString(), getFilesDir()));
                             String key=Files.getKey(getFilesDir());
                             future.get();
                             runOnUiThread(() -> {
-                                if(key!=null){
+                                if(key!=null&&key.length()>10){
                                     Intent intent = new Intent(MainActivity.this, Find.class);
                                     startActivity(intent);}
                             });
@@ -81,18 +80,29 @@ public class MainActivity extends AppCompatActivity {
                             executorService.shutdown();
                         }
                     }
-                    else
-                    {
+                    else if(stcLogin.isChecked()){ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-                        ExecutorService executorService = Executors.newSingleThreadExecutor();
-                        executorService.execute(new Connection("register "+txtUsername.getText()+" "+txtEmail.getText()+" "+txtPassword.getText(), getFilesDir()));
-                    }
+                            try {
+                                Future<?> future = executorService.submit(new Connection("register "+txtUsername.getText()+" "+txtEmail.getText()+" "+txtPassword.getText(), getFilesDir()));
+                                String key=Files.getKey(getFilesDir());
+                                future.get();
+                                System.out.println("daadda");
+                                runOnUiThread(() -> {
+                                    if(key!=null&&key.length()>10){
+                                        Intent intent = new Intent(MainActivity.this, Find.class);
+                                        startActivity(intent);}
+                                });
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                executorService.shutdown();
+                            }
+                        }
                 }
 
                 //executorService.execute(new Connection("login Admin111@gmail.com Admin"));
                 //executorService.execute(new Connection("register Rares raresmucea111@gmail.com rarnet"));
-
-            }
         });
     }
 }
