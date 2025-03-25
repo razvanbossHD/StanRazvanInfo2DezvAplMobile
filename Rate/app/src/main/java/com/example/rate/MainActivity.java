@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
                                 Future<?> future = executorService.submit(new Connection("register "+txtUsername.getText()+" "+txtEmail.getText()+" "+txtPassword.getText(), getFilesDir()));
                                 String key=Files.getKey(getFilesDir());
                                 future.get();
-                                System.out.println("daadda");
                                 runOnUiThread(() -> {
                                     if(key!=null&&key.length()>10){
                                         Intent intent = new Intent(MainActivity.this, Find.class);
