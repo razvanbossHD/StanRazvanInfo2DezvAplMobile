@@ -12,12 +12,8 @@ import com.example.safealert.MainActivity;
 
 public class PowerButt extends Service {
 
-    private static final String TAG = "LocationService";
 
-    private static final long limita = 3000;
 
-    private int apasari = 0;
-    private long ulttmp = 0;
 
     @Override
     public void onCreate() {
@@ -44,17 +40,17 @@ public class PowerButt extends Service {
     };
 
     private void handlePowerButtonPress(long currentTime) {
-        if (currentTime - ulttmp < limita) {
-            apasari++;
+        if (currentTime - MainActivity.ulttmp < 3000) {
+            MainActivity.apasari++;
         } else {
-            apasari = 1;
+            MainActivity.apasari = 1;
         }
 
-        ulttmp = currentTime;
+        MainActivity.ulttmp = currentTime;
 
-        if (apasari == 3) {
+        if (MainActivity.apasari == 3) {
             MainActivity.act.SendSMS();
-            apasari = 0;
+            MainActivity.apasari = 0;
         }
     }
 
@@ -62,7 +58,6 @@ public class PowerButt extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Unregister the receiver to prevent memory leaks
         unregisterReceiver(powerButtonReceiver);
     }
 }

@@ -29,7 +29,7 @@ public class GamePage extends AppCompatActivity {
     String Description;
     int id=0;
     Float Rating;
-    TextView txtGameName, txtGameRating, txtComment, txtRate;
+    TextView txtGameName, txtGameRating, txtGameDescription, txtComment, txtRate;
     Button btnPost;
     public static boolean isNumeric(String strNum) {
         if (strNum == null) {
@@ -48,7 +48,20 @@ public class GamePage extends AppCompatActivity {
     {
         LinearLayout linearLayout = findViewById(R.id.body);
         TextView name = new TextView(this);
-        name.setText(comments.name+"("+comments.rating+")");
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+
+        try {Future<?> future = executorService.submit(new Connection("getaccount "+comments.name));
+            future.get();
+            runOnUiThread(() -> {
+                name.setText(MainActivity.msj+"("+comments.rating+")");
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            executorService.shutdown();
+        }
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -72,9 +85,12 @@ public class GamePage extends AppCompatActivity {
         });
         Bundle b = getIntent().getExtras();
         id = b.getInt("ID");
+        System.out.println("id");
         btnPost= findViewById(R.id.btnPost);
         txtComment= findViewById(R.id.txtComment);
         txtRate= findViewById(R.id.txtRate);
+        txtGameDescription=findViewById(R.id.txtGameDescription);
+        txtGameRating=findViewById(R.id.txtGameRating);
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,9 +99,10 @@ public class GamePage extends AppCompatActivity {
                     System.out.println("alala");
                     if(isNumeric(txtRate.getText().toString())){
                         System.out.println("aha");
-                        Future<?> future = executorService.submit(new Connection("post "+id+" "+txtComment.getText().toString()+" "+txtRate.getText().toString(), getFilesDir()));
+                        Future<?> future = executorService.submit(new Connection("post "+id+" "+MainActivity.id+" "+txtComment.getText().toString()+" "+txtRate.getText().toString()));
                         future.get();
                         runOnUiThread(() -> {
+
                         });
                     }
                 } catch (Exception e) {
@@ -99,17 +116,19 @@ public class GamePage extends AppCompatActivity {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         try {
 
-            Future<?> future = executorService.submit(new Connection("getgame "+id, getFilesDir()));
-            String key= Files.getKey(getFilesDir());
-            System.out.println("Key:"+key);
+            Future<?> future = executorService.submit(new Connection("getgame "+id));
             future.get();
             runOnUiThread(() -> {
-                if(key!=null&&key.length()>5){
-                    String[] strin = key.split("_");
+                String key= MainActivity.msj;
+                if(key!=null&& !key.isEmpty()){
+                    String[] strin = key.split("non404");
                     this.Name=strin[0];
-                    txtGameName.setText(key);
+                    txtGameName.setText(strin[0]);
                     this.Description=strin[1];
                     this.Rating=Float.parseFloat(strin[2]);
+                    txtGameDescription.setText(Description);
+                    String t = "Rating:"+Rating+"/10";
+                    txtGameRating.setText(t);
                 }});
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,10 +137,11 @@ public class GamePage extends AppCompatActivity {
         }
         executorService = Executors.newSingleThreadExecutor();
         try {
-            Future<?> future = executorService.submit(new Connection("getcomments", getFilesDir()));
-            Comments[] key= Files.getcomments(getFilesDir());
+            Future<?> future = executorService.submit(new Connection("getcomments "+id));
             future.get();
             runOnUiThread(() -> {
+
+                Comments[] key= Files.getcomments(getFilesDir());
                 for(int i=0;i<key.length&&key[i]!=null;++i)
                     newcomment(key[i]);
 

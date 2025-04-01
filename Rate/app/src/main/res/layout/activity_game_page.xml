@@ -25,6 +25,13 @@
                 android:textSize="34sp" />
 
             <TextView
+                android:id="@+id/txtGameDescription"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="No Description"
+                android:textSize="34sp" />
+
+            <TextView
                 android:id="@+id/txtGameRating"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

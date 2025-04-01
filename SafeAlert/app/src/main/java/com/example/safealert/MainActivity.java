@@ -2,12 +2,14 @@ package com.example.safealert;
 
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import Classes.Loc;
 import Classes.LocationServ;
 import Classes.PowerButt;
 import Classes.SMS;
@@ -20,24 +22,26 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int REQUEST_CONTACTS_PERMISSION = 1;
     private static final int REQUEST_SMS_PERMISSION = 1;
+    private static final int REQUEST_PHONE_CALL = 1;
     public static double longitudine=0, latitudine=0;
-    public static final int  nrclick= 3;
-    public static final long timpapasare = 3000;
-    public static int apasare=0;
-    public static long ultapasare = 0;
+    public static double longitudinesigura=0, latitudinesigura=0;
+    public static int apasari=0;
+    public static long ulttmp = 0;
+    public static long milisec=10000;
+
+    public static String mesaj="Sunt in pericol!";
     public static MainActivity act;
-    Button btnSOS;
+    AlertDialog alertDialog;
+    public CountDownTimer countdown;
+    Button btnSOS, btnCall, btnMarkSafe, btnAleg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +53,40 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         permisiuni();
+        StartPow();
         btnSOS = findViewById(R.id.btnSOS);
         btnSOS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SendSMS();
+            }
+        });
+        btnCall = findViewById(R.id.btnCall);
+        btnCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+                }
+                else
+                {
+                    Alert("Apel de urgenta in 10 secunde");
+                }
+            }
+        });
+        btnMarkSafe = findViewById(R.id.btnMarkSafe);
+        btnMarkSafe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.longitudinesigura=MainActivity.longitudine;
+                MainActivity.latitudinesigura=MainActivity.latitudine;
+            }
+        });
+        btnAleg = findViewById(R.id.btnAleg);
+        btnAleg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                starttimerauto();
             }
         });
         act=this;
@@ -101,6 +134,11 @@ public class MainActivity extends AppCompatActivity {
             startLocationServ();
         }
     }
+    public void starttimerauto()
+    {
+        Intent intent = new Intent(this, TimerAutomat.class);
+        startActivity(intent);
+    }
     public void SendSMS()
     {
 
@@ -120,5 +158,37 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, LocationServ.class);
         startService(serviceIntent);
         System.out.println(isMyServiceRunning(LocationServ.class));
+    }
+    public void Alert(String msg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(act);
+
+        builder.setMessage(msg);
+
+        builder.setTitle("Alert !");
+
+        builder.setCancelable(false);
+        builder.setNegativeButton("Anuleaza", (DialogInterface.OnClickListener) (dialog, which) -> {
+
+            dialog.cancel();
+            countdown.cancel();
+        });
+        alertDialog = builder.create();
+        alertDialog.show();
+        countdown=new CountDownTimer(10000, 1000) {
+            String message=msg;
+            public void onTick(long millisUntilFinished) {
+                alertDialog.setMessage(message+" "+ millisUntilFinished / 1000);
+            }
+
+            public void onFinish() {
+                SendSMS();
+                alertDialog.cancel();
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "Your Phone_number"));
+                startActivity(intent);
+
+
+            }
+
+        }.start();
     }
 }

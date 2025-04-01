@@ -14,18 +14,45 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.security.Key;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import Classes.Connection;
 import Classes.Files;
 
 public class MainActivity extends AppCompatActivity {
     Button btnEnter;
+    public static String msj="";
     EditText txtEmail, txtPassword, txtUsername;
     TextView lblUsername;
     Switch stcLogin, stcCookies;
+
+    public static int id=1;
+    boolean getid(String key)
+    {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        AtomicBoolean ret = new AtomicBoolean(false);
+        try {Future<?> future = executorService.submit(new Connection("checkkey " + key));
+            future.get();
+            runOnUiThread(() -> {
+                if(MainActivity.msj!=null){
+                    ret.set(true);
+                    id=Integer.parseInt(MainActivity.msj);
+                    System.out.println(id);
+                }
+                ret.set(false);
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(ret.get());
+        return ret.get();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,11 +92,15 @@ public class MainActivity extends AppCompatActivity {
                 if(!stcLogin.isChecked()){ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
-                        try {Future<?> future = executorService.submit(new Connection("login " + txtUsername.getText().toString() + " " + txtEmail.getText().toString() + " " + txtPassword.getText().toString(), getFilesDir()));
-                            String key=Files.getKey(getFilesDir());
+                        try {Future<?> future = executorService.submit(new Connection("login " + txtUsername.getText().toString() + " " + txtEmail.getText().toString() + " " + txtPassword.getText().toString()));
+
                             future.get();
                             runOnUiThread(() -> {
-                                if(key!=null&&key.length()>10){
+                                String[] rasp =MainActivity.msj.split(" ");
+                                Files.setKey( getFilesDir(),rasp[0]);
+                                MainActivity.id=Integer.parseInt(rasp[1]);
+                                String key=Files.getKey(getFilesDir());
+                                if(!key.isEmpty()){
                                     Intent intent = new Intent(MainActivity.this, Find.class);
                                     startActivity(intent);}
                             });
@@ -83,11 +114,14 @@ public class MainActivity extends AppCompatActivity {
                     else if(stcLogin.isChecked()){ExecutorService executorService = Executors.newSingleThreadExecutor();
 
                             try {
-                                Future<?> future = executorService.submit(new Connection("register "+txtUsername.getText()+" "+txtEmail.getText()+" "+txtPassword.getText(), getFilesDir()));
-                                String key=Files.getKey(getFilesDir());
+                                Future<?> future = executorService.submit(new Connection("register "+txtUsername.getText()+" "+txtEmail.getText()+" "+txtPassword.getText()));
                                 future.get();
                                 runOnUiThread(() -> {
-                                    if(key!=null&&key.length()>10){
+                                    String[] rasp =MainActivity.msj.split(" ");
+                                    Files.setKey( getFilesDir(),rasp[0]);
+                                    MainActivity.id=Integer.parseInt(rasp[1]);
+                                    String key=Files.getKey(getFilesDir());
+                                    if(!key.isEmpty()){
                                         Intent intent = new Intent(MainActivity.this, Find.class);
                                         startActivity(intent);}
                                 });

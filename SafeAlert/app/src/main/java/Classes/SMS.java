@@ -37,7 +37,6 @@ public class SMS extends Service {
             stopSelf();
             return;
         }
-        System.out.println("aa");
         trimiteSms();
     }
 
@@ -70,7 +69,7 @@ public class SMS extends Service {
         if (phoneNumbers.size() > 0) {
             double latitude = MainActivity.latitudine;
             double longitude = MainActivity.longitudine;
-            String smsMessage = "Sunt in pericol! Locatia mea este: langitudine-"+String.valueOf(latitude)+" longitudine-"+String.valueOf(longitude);
+            String smsMessage = MainActivity.mesaj+String.valueOf(latitude)+" longitudine-"+String.valueOf(longitude);
             SmsManager smsManager = SmsManager.getDefault();
 
             for (String phoneNumber : phoneNumbers) {
@@ -88,12 +87,11 @@ public class SMS extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Optional: Clean up resources or stop any ongoing operations
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null; // No binding is necessary for this service
+        return null;
     }
 }

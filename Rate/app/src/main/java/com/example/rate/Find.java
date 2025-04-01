@@ -59,10 +59,29 @@ public class Find extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        String[] games= Conn.getStr("getgames ").split(" ");
+        /*String[] games= Conn.getStr("getgames ").split(" ");
         for(int i=0;2*i+1<games.length&&games[i]!=null;++i){
             newButton(games[2*i], Integer.parseInt(games[2*i+1]) );
-                }
+                }*/
 
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<?> future = executorService.submit(new Connection("getgames "));
+            Files.setKey( getFilesDir(),MainActivity.msj);
+            String key=Files.getKey(getFilesDir());
+            future.get();
+            runOnUiThread(() -> {
+                String[] games= MainActivity.msj.split(" ");
+                for(int i=0;2*i+1<games.length&&games[i]!=null;++i){
+                    newButton(games[2*i], Integer.parseInt(games[2*i+1]) );
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            executorService.shutdown();
+        }
     }
 }

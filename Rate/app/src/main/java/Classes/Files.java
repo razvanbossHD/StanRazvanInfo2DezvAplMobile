@@ -3,8 +3,11 @@ package Classes;
 import android.util.Log;
 import android.widget.Button;
 
+import com.example.rate.MainActivity;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,7 +22,17 @@ public class Files {
         try {
 
             String nume = "key.txt";
+            File file = new File(dir+"/"+nume);
 
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("File deleted successfully.");
+                } else {
+                    System.out.println("Failed to delete the file.");
+                }
+            } else {
+                System.out.println("File does not exist.");
+            }
 
             FileWriter fileWriter = new FileWriter(dir + "/" + nume, false);
             BufferedWriter writer = new BufferedWriter(fileWriter);
@@ -75,9 +88,21 @@ public class Files {
     }
     public static Comments[] getcomments(File dir)
     {
-        File file=new File(dir, "key.txt");
         Comments[] comments= new Comments[1000];
+        String[] rasp= MainActivity.msj.split("non404");
+        System.out.println(rasp[0]);
+
         int i=0;
+        while (i<rasp.length) {
+            if(i%3==0)
+                comments[i/3]=new Comments(rasp[i]);
+            else if(i%3==2)
+                comments[i/3].rating=Integer.parseInt(rasp[i]);
+            else if(i%3==1)
+                comments[i/3].text=rasp[i];
+            i=i+1;
+        }
+        /*
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 String line;
@@ -93,7 +118,7 @@ public class Files {
             } catch (IOException e) {
                 Log.e("File Error", "Error reading file", e);
             }
-        }
+        }*/
         return comments;
     }
     public static void setGames(File dir, String comments)

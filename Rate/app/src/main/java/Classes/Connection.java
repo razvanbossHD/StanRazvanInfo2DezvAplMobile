@@ -1,6 +1,9 @@
 package Classes;
 
+import com.example.rate.MainActivity;
+
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,7 +27,9 @@ public class Connection implements Runnable {
             outputStream.flush();
             BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String a;
-            Files.setKey( dir,a=inputStream.readLine());
+
+            System.out.println(MainActivity.msj=inputStream.readLine());
+
 
 
             socket.close();
@@ -37,7 +42,7 @@ public class Connection implements Runnable {
         }
     }
 
-    public Connection(String command, File dir)
+    public Connection(String command)
     {
         this.command=command;
         this.dir=dir;

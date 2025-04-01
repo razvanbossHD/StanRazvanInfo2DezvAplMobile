@@ -1,11 +1,16 @@
 package Classes;
 
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -17,6 +22,7 @@ public class LocationServ extends Service {
 
     private LocationManager locationManager;
     private LocationListener locationListener;
+    ToneGenerator toneGenerator;
 
     public double latitude;
     public double longitude;
@@ -35,30 +41,36 @@ public class LocationServ extends Service {
                     MainActivity.latitudine=latitude;
                     MainActivity.longitudine=longitude;
                     Log.d(TAG, "Latitude: " + latitude + ", Longitude: " + longitude);
+                    double dist=sqrt(pow(MainActivity.latitudinesigura-latitude, 2)+pow(MainActivity.longitudinesigura-longitude, 2));
+                    System.out.println(dist);
+                    System.out.println(MainActivity.latitudine);
+                    if(MainActivity.latitudinesigura!=0&&MainActivity.longitudinesigura!=0&&dist>0.1)
+                    {
+                        MainActivity.act.SendSMS();
+                        toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 1000);
+                        toneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT, 5000);
+                    }
                 }
             }
 
             @Override
             public void onStatusChanged(String provider, int status, android.os.Bundle extras) {
-                // Optional: handle provider status changes here
             }
 
             @Override
             public void onProviderEnabled(String provider) {
-                // Optional: handle provider enabled events
             }
 
             @Override
             public void onProviderDisabled(String provider) {
-                // Optional: handle provider disabled events
             }
         };
 
         try {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    10000, // 10 seconds
-                    10, // 10 meters
+                    1000,
+                    1,
                     locationListener
             );
         } catch (SecurityException e) {
@@ -68,7 +80,7 @@ public class LocationServ extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null; // You don't need to bind this service, so return null
+        return null;
     }
 
     @Override

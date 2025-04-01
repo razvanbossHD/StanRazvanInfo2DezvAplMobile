@@ -42,8 +42,8 @@ public class NewGame extends AppCompatActivity {
             public void onClick(View v) {
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 if(txtDescription.getText().toString()!=""&&txtGenre.getText().toString()!=""&&txtDescription.getText().toString()!=""){
-                    try {Future<?> future = executorService.submit(new Connection("newgame " + txtName.getText().toString() + " " + txtGenre.getText().toString() + " " + txtDescription.getText().toString(), getFilesDir()));
-                        String key=Files.getKey(getFilesDir());
+                    try {Future<?> future = executorService.submit(new Connection("newgame " + txtName.getText().toString() + " " + txtGenre.getText().toString() + " " + txtDescription.getText().toString()));
+                        String key=MainActivity.msj;
                         future.get();
                         finish();
                         runOnUiThread(() -> {
